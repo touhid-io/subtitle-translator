@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Subtitle Translator - English to Bengali</title>
-        <link rel="icon" href="https://res.cloudinary.com/drphgjcmk/image/upload/v1760973268/favicon_ewytlm.ico">
+    <link rel="icon" href="https://res.cloudinary.com/drphgjcmk/image/upload/v1760973268/favicon_ewytlm.ico">
 
     <style>
         * {
@@ -283,11 +283,6 @@
             50% { opacity: 0.7; }
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
         .download-section {
             display: none;
             margin-top: 25px;
@@ -487,14 +482,16 @@
             }
         });
 
+        // ✅ Clear previous translation when API key changes
         apiKeyInput.addEventListener('input', () => {
-    downloadSection.classList.remove('show');
-    translatedContent = null;
-});
+            downloadSection.classList.remove('show');
+            translatedContent = null;
+        });
+
         removeFile.addEventListener('click', (e) => {
             e.stopPropagation();
             uploadedFile = null;
-            translatedContent = null; // ✅ FIX: Clear translated content
+            translatedContent = null;
             fileInput.value = '';
             fileInfo.classList.remove('show');
             translateBtn.disabled = true;
@@ -508,13 +505,20 @@
                 return;
             }
 
+            // ✅ Reset everything completely
+            uploadedFile = null;
+            translatedContent = null;
+            downloadSection.classList.remove('show');
+            progress.classList.remove('show');
+            errorMessage.classList.remove('show');
+            
+            // ✅ Now set the new file
             uploadedFile = file;
-            translatedContent = null; // ✅ FIX: Clear old translated content when new file is selected
             fileName.textContent = file.name;
             fileInfo.classList.add('show');
             translateBtn.disabled = false;
-            downloadSection.classList.remove('show');
-            errorMessage.classList.remove('show');
+            
+            console.log('New file uploaded:', file.name); // Debug log
         }
 
         translateBtn.addEventListener('click', async () => {
@@ -531,6 +535,10 @@
             }
 
             try {
+                // ✅ Clear old translation first
+                translatedContent = null;
+                downloadSection.classList.remove('show');
+                
                 translateBtn.disabled = true;
                 progress.classList.add('show');
                 progressFill.style.width = '10%';
@@ -538,6 +546,7 @@
 
                 // Read file
                 progressText.textContent = 'Reading subtitle file...';
+                console.log('Reading file:', uploadedFile.name); // Debug
                 const fileContent = await readFileAsText(uploadedFile);
                 
                 // Parse SRT
@@ -697,4 +706,3 @@
     </script>
 </body>
 </html>
-

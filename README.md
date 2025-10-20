@@ -1,112 +1,190 @@
-# 🎬 Subtitle Translator - English to Bengali
+<h1 align="center">🎬 Subtitle Translator – English → Bengali</h1> <p align="center"><strong>AI-Powered Language Bridge Built on Google Gemini 2.5</strong></p> <p align="center">A next-gen translation system that converts English SRT subtitle files into natural, context-aware Bengali using <strong>Gemini Flash</strong>.</p> 
 
-Translate English SRT subtitle files to natural Bengali using **Google Gemini AI**.
+---
 
-## ✨ Features
+## 🌟 Overview
 
-- 🌐 **English to Bengali Translation** powered by Gemini 2.0 Flash
-- 📝 **Custom Translation Prompts** - Control the style and tone
-- ⚡ **Batch Processing** - Handles large subtitle files efficiently
-- 📊 **Real-time Progress Tracking** - See translation status live
-- 💾 **Download Translated SRT** - Get Bengali subtitles instantly
-- 🎨 **Beautiful UI** - Modern gradient design with animations
+**Subtitle Translator** is a sophisticated localization tool designed for Bengali-speaking movie enthusiasts and content creators. It leverages Google's cutting-edge Gemini 2.5 Flash AI to deliver context-aware, culturally nuanced translations that preserve the essence of cinematic dialogue.
 
-## 🚀 Live Demo
+Unlike basic word-for-word translators, this system understands:
+- Emotional context and tone
+- Cultural references and idioms  
+- Conversational flow and timing
+- Character voice consistency
 
-- **Frontend:** [Deploy on Vercel](https://vercel.com)
-- **Backend:** [Deploy on Render](https://render.com)
+### Why This Matters
 
-## 📋 Prerequisites
+Bengali is one of the world's most spoken languages, yet quality localized content remains scarce. This tool democratizes access to global cinema by making professional-grade translation available to everyone.
 
-- Google Gemini API Key ([Get it free](https://aistudio.google.com/app/apikey))
-- Python 3.9+ (for backend)
-- Modern web browser (for frontend)
+---
 
-## 🛠️ Local Setup
+## ✨ Key Features
 
-### Backend Setup
+### 🧠 Intelligent Translation
+- **Gemini 2.5 Flash Integration** – Leverages state-of-the-art language models for human-quality output
+- **Context Preservation** – Maintains narrative flow across subtitle sequences
+- **Dialect Customization** – Choose between formal literary Bengali or colloquial conversational style
+- **Tone Adaptation** – Adjusts translation based on genre (drama, comedy, thriller)
 
-1. Clone the repository:
+### ⚡ Performance & Workflow
+- **Batch Processing** – Handles large SRT files with hundreds of entries
+- **Real-Time Progress** – Live streaming updates via Server-Sent Events (SSE)
+- **Instant Download** – One-click export of translated `.srt` files
+- **Error Recovery** – Graceful handling of API limits and network issues
+
+### 🎨 User Experience
+- **Glassmorphism Design** – Modern frosted-glass aesthetic with animated gradients
+- **Drag & Drop Upload** – Intuitive file handling
+- **Mobile Responsive** – Works seamlessly across devices
+- **Zero Configuration** – Just add your API key and start translating
+
+---
+
+## 🖼️ Interface Preview 
+
+### 📸 Screenshot 
+
+![Screenshot](https://res.cloudinary.com/drphgjcmk/image/upload/v1760973255/Screenshot_2025-10-20_205816_xazlko.png) 
+
+### 🌐 Preview Link 
+**[➡️ Click Here to View Live Project](https://subtitle-translator-kappa.vercel.app/)** 
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────┐      ┌──────────────────┐      ┌─────────────────┐
+│   Frontend      │─────▶│  Flask Backend   │─────▶│  Gemini API     │
+│  (Vanilla JS)   │◀─────│  (Python/SSE)    │◀─────│  (Translation)  │
+└─────────────────┘      └──────────────────┘      └─────────────────┘
+     │                            │
+     │                            ▼
+     │                   ┌──────────────────┐
+     └──────────────────▶│  SRT Parser      │
+                         │  (Subtitle Logic)│
+                         └──────────────────┘
+```
+
+**Tech Stack:**
+- **Backend:** Flask (Python), Google Generative AI SDK
+- **Frontend:** HTML5, CSS3 (Custom Animations), Vanilla JavaScript
+- **Communication:** SSE (Server-Sent Events) for real-time updates
+- **Deployment:** Vercel (Frontend), Python-compatible hosting (Backend)
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- **Python 3.9+** installed on your system
+- **Gemini API Key** from [Google AI Studio](https://aistudio.google.com/app/apikey) (free tier available)
+- Modern web browser (Chrome, Firefox, Edge, Brave)
+
+### Installation
+
+#### 1️⃣ Clone the Repository
 ```bash
 git clone https://github.com/YOUR_USERNAME/subtitle-translator-gemini.git
 cd subtitle-translator-gemini
 ```
 
-2. Install dependencies:
+#### 2️⃣ Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Run the backend server:
+**Required packages:**
+```
+flask
+flask-cors
+google-generativeai
+python-dotenv
+```
+
+#### 3️⃣ Configure Environment
+Create a `.env` file in the root directory:
+```env
+GEMINI_API_KEY=your_api_key_here
+FLASK_ENV=development
+```
+
+#### 4️⃣ Run the Backend
 ```bash
 python backend.py
 ```
+The server will start at `http://localhost:5000`
 
-Backend will run on `http://localhost:5000`
-
-### Frontend Setup
-
-1. Open `index.html` in your browser, or use a local server:
+#### 5️⃣ Launch the Frontend
+Open `index.html` in your browser, or use a local server:
 ```bash
+# Using Python's built-in server
 python -m http.server 8000
+# Then visit http://localhost:8000
 ```
 
-2. Open `http://localhost:8000` in your browser
+---
 
-3. Enter your Gemini API key and upload an SRT file
+## 📖 Usage Guide
 
-## 🌐 Deployment
+### Basic Workflow
 
-### Deploy Backend (Render.com)
+1. **Upload SRT File**  
+   Drag and drop your English subtitle file or click to browse
 
-1. Go to [Render.com](https://render.com)
-2. Click **New** → **Web Service**
-3. Connect your GitHub repository
-4. **Build Command:** `pip install -r requirements.txt`
-5. **Start Command:** `gunicorn --bind 0.0.0.0:$PORT backend:app`
-6. Click **Deploy**
-7. Copy your backend URL (e.g., `https://your-app.onrender.com`)
+2. **Enter API Key**  
+   Paste your Gemini API key (stored locally, never sent to external servers)
 
-### Deploy Frontend (Vercel)
+3. **Customize Translation** (Optional)  
+   - Select tone: Formal, Casual, or Neutral
+   - Choose dialect: Literary Bengali or Conversational
 
-1. Go to [Vercel.com](https://vercel.com)
-2. Click **Add New** → **Project**
-3. Import your GitHub repository
-4. Click **Deploy**
-5. After deployment, update `index.html`:
-```javascript
-const BACKEND_URL = 'https://your-backend.onrender.com'; // Replace with your Render URL
-```
-6. Commit and push changes - Vercel will auto-redeploy
+4. **Translate**  
+   Click "Start Translation" and watch real-time progress
 
-## 📖 Usage
+5. **Download**  
+   Once complete, download your translated `.srt` file
 
-1. Get your free Gemini API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
-2. Enter the API key in the app
-3. (Optional) Customize translation style with a custom prompt
-4. Upload your English `.srt` subtitle file
-5. Click **Translate to Bengali**
-6. Wait for translation to complete
-7. Download the Bengali subtitle file
+### Advanced Options
 
-## 🔧 API Endpoints
-
-### `POST /translate`
-Translates subtitles with Server-Sent Events (SSE) for real-time progress.
-
-**Request:**
-```json
-{
-  "apiKey": "your-gemini-api-key",
-  "subtitles": [
-    {
-      "index": "1",
-      "timestamp": "00:00:01,000 --> 00:00:03,000",
-      "text": "Hello world"
-    }
-  ],
-  "customPrompt": "Translate to casual Bengali"
-}
+**Custom Prompts:**  
+Modify the translation prompt in `backend.py` to fine-tune output:
+```python
+prompt = f"""
+Translate this English subtitle to Bengali.
+Style: {custom_style}
+Context: {genre}
+Preserve timing codes and formatting.
+"""
 ```
 
-**Response (SSE):**
+**Batch Processing:**  
+For multiple files, modify the upload endpoint to accept arrays:
+```python
+@app.route('/batch-translate', methods=['POST'])
+def batch_translate():
+    files = request.files.getlist('files[]')
+    # Process each file
+```
+
+---
+
+## 🎯 Use Cases
+
+- **Movie Fans:** Enjoy international films in native Bengali
+- **Content Creators:** Localize YouTube videos and web series
+- **Educators:** Translate educational content for Bengali-speaking students
+- **Streaming Platforms:** Build localization pipelines for regional markets
+- **Subtitle Communities:** Accelerate fansubbing projects
+
+---
+
+<p align="center">
+  <strong>Made for the Bengali-speaking community</strong><br/>
+  <em>Bridging languages, connecting cultures</em>
+</p>
+
+<p align="center">
+  <sub>Star this repo if you find it useful! ⭐</sub>
+</p>

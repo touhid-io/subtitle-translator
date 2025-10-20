@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subtitle Translator - English to Bengali</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            position: relative;
+            overflow-x: hidden;
+            transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+            perspective: 1000px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: moveBackground 20s linear infinite;
+            pointer-events: none;
+            will-change: transform;
+        }
+
+        @keyframes moveBackground {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 100%;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+            margin: 0;
+            will-change: contents;
+            transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 20px;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #999;
+        }
+
+        .status-dot.connected {
+            background: #00b894;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .api-key-section {
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95em;
+        }
+
+        input[type="text"], input[type="password"], textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .upload-zone {
+            border: 3px dashed #667eea;
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(102, 126, 234, 0.05);
+            position: relative;
+        }
+
+        .upload-zone:hover {
+            border-color: #764ba2;
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .upload-zone.drag-over {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #764ba2;
+        }
+
+        .upload-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        .upload-subtext {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .file-info {
+            display: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .file-info.show {
+            display: flex;
+        }
+
+        .file-name {
+            font-weight: 600;
+        }
+
+        .remove-file {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .remove-file:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .progress {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .progress.show {
+            display: block;
+        }
+
+        .progress-text {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+            animation: pulseProgress 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulseProgress {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .download-section {
+            display: none;
+            margin-top: 25px;
+        }
+
+        .download-section.show {
+            display: block;
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            box-shadow: 0 4px 15px rgba(0, 184, 148, 0.4);
+        }
+
+        .btn-download:hover {
+            box-shadow: 0 6px 20px rgba(0, 184, 148, 0.6);
+        }
+
+        .error-message {
+            background: #ff6b6b;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .help-text {
+            font-size: 0.85em;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .help-text a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .help-text a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .upload-zone {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎬 Subtitle Translator</h1>
+            <p>English to Bengali with Gemini AI</p>
+            <div class="status-indicator">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="statusText">Checking server...</span>
+            </div>
+        </div>
+
+        <div class="api-key-section">
+            <div class="input-group">
+                <label for="apiKey">Gemini API Key</label>
+                <input type="password" id="apiKey" placeholder="Enter your Gemini API key">
+                <div class="help-text">Get your free API key from <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a></div>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="translationPrompt">Translation Style (Optional)</label>
+            <textarea id="translationPrompt" placeholder="Example: Translate in casual Bangla with natural expressions, avoid formal language...">Translate the English subtitles to natural Bengali. Maintain context and conversational flow. Use appropriate Bengali expressions.</textarea>
+        </div>
+
+        <div class="input-group">
+            <label>Upload SRT File</label>
+            <div class="upload-zone" id="uploadZone">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text">Click or Drag & Drop</div>
+                <div class="upload-subtext">Upload your .srt subtitle file</div>
+            </div>
+            <input type="file" id="fileInput" accept=".srt,text/plain,*">
+            <div class="file-info" id="fileInfo">
+                <span class="file-name" id="fileName"></span>
+                <button class="remove-file" id="removeFile">Remove</button>
+            </div>
+        </div>
+
+        <button class="btn" id="translateBtn" disabled>Translate to Bengali</button>
+
+        <div class="progress" id="progress">
+            <div class="progress-text" id="progressText">Processing...</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="download-section" id="downloadSection">
+            <div class="success-message">✅ Translation Complete!</div>
+            <button class="btn btn-download" id="downloadBtn">Download Bengali Subtitle</button>
+        </div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:5000';
+        let uploadedFile = null;
+        let translatedContent = null;
+
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const removeFile = document.getElementById('removeFile');
+        const translateBtn = document.getElementById('translateBtn');
+        const apiKeyInput = document.getElementById('apiKey');
+        const translationPrompt = document.getElementById('translationPrompt');
+        const progress = document.getElementById('progress');
+        const progressText = document.getElementById('progressText');
+        const progressFill = document.getElementById('progressFill');
+        const downloadSection = document.getElementById('downloadSection');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+
+        // Check backend connection
+        async function checkBackend() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/health`);
+                if (response.ok) {
+                    statusDot.classList.add('connected');
+                    statusText.textContent = 'Backend connected';
+                    statusText.style.color = '#00b894';
+                } else {
+                    throw new Error('Backend not responding');
+                }
+            } catch (error) {
+                statusText.textContent = 'Backend offline - Run backend.py first!';
+                statusText.style.color = '#ff6b6b';
+                showError('⚠️ Backend server not running! Please start backend.py first.');
+            }
+        }
+
+        checkBackend();
+        setInterval(checkBackend, 10000);
+
+        uploadZone.addEventListener('click', () => fileInput.click());
+
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('drag-over');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('drag-over');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        removeFile.addEventListener('click', (e) => {
+            e.stopPropagation();
+            uploadedFile = null;
+            translatedContent = null; // ✅ FIX: Clear translated content
+            fileInput.value = '';
+            fileInfo.classList.remove('show');
+            translateBtn.disabled = true;
+            downloadSection.classList.remove('show');
+            errorMessage.classList.remove('show');
+        });
+
+        function handleFile(file) {
+            if (!file.name.endsWith('.srt')) {
+                showError('Please upload a valid .srt file');
+                return;
+            }
+
+            uploadedFile = file;
+            translatedContent = null; // ✅ FIX: Clear old translated content when new file is selected
+            fileName.textContent = file.name;
+            fileInfo.classList.add('show');
+            translateBtn.disabled = false;
+            downloadSection.classList.remove('show');
+            errorMessage.classList.remove('show');
+        }
+
+        translateBtn.addEventListener('click', async () => {
+            const apiKey = apiKeyInput.value.trim();
+            
+            if (!apiKey) {
+                showError('Please enter your Gemini API key');
+                return;
+            }
+
+            if (!uploadedFile) {
+                showError('Please upload an SRT file');
+                return;
+            }
+
+            try {
+                translateBtn.disabled = true;
+                progress.classList.add('show');
+                progressFill.style.width = '10%';
+                errorMessage.classList.remove('show');
+
+                // Read file
+                progressText.textContent = 'Reading subtitle file...';
+                const fileContent = await readFileAsText(uploadedFile);
+                
+                // Parse SRT
+                progressText.textContent = 'Parsing subtitles...';
+                progressFill.style.width = '20%';
+                const subtitles = parseSRT(fileContent);
+
+                if (subtitles.length === 0) {
+                    throw new Error('No valid subtitles found in file');
+                }
+
+                // Send to backend with SSE
+                progressText.textContent = `Translating ${subtitles.length} subtitles with Gemini AI...`;
+                progressFill.style.width = '30%';
+
+                // Add timeout
+                const timeoutId = setTimeout(() => {
+                    throw new Error('Translation timeout - Gemini API might be slow or key is invalid');
+                }, 120000);
+
+                const response = await fetch(`${BACKEND_URL}/translate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        apiKey: apiKey,
+                        subtitles: subtitles,
+                        customPrompt: translationPrompt.value
+                    })
+                });
+
+                if (!response.ok) {
+                    clearTimeout(timeoutId);
+                    const errorText = await response.text();
+                    throw new Error(`Backend error: ${response.status} - ${errorText}`);
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                let lastUpdate = Date.now();
+
+                while (true) {
+                    if (Date.now() - lastUpdate > 60000) {
+                        clearTimeout(timeoutId);
+                        throw new Error('No response from Gemini API for 60 seconds. Check your API key or try again.');
+                    }
+
+                    const { done, value } = await reader.read();
+                    
+                    if (done) {
+                        clearTimeout(timeoutId);
+                        break;
+                    }
+                    
+                    lastUpdate = Date.now();
+                    
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop();
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(line.substring(6));
+                                
+                                if (data.error) {
+                                    throw new Error(data.error);
+                                }
+                                
+                                if (data.progress !== undefined) {
+                                    progressFill.style.width = data.progress + '%';
+                                    if (data.message) {
+                                        progressText.textContent = data.message;
+                                    }
+                                }
+                                
+                                if (data.translatedSubtitles) {
+                                    progressText.textContent = 'Generating Bengali subtitle file...';
+                                    translatedContent = generateSRT(data.translatedSubtitles);
+                                    
+                                    setTimeout(() => {
+                                        progress.classList.remove('show');
+                                        downloadSection.classList.add('show');
+                                        translateBtn.disabled = false;
+                                    }, 500);
+                                }
+                            } catch (e) {
+                                console.error('Parse error:', e);
+                            }
+                        }
+                    }
+                }
+
+            } catch (error) {
+                console.error('Translation error:', error);
+                showError('Translation failed: ' + error.message);
+                progress.classList.remove('show');
+                translateBtn.disabled = false;
+            }
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            if (!translatedContent) return;
+
+            const blob = new Blob([translatedContent], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = uploadedFile.name.replace('.srt', '_bengali.srt');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        function readFileAsText(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsText(file);
+            });
+        }
+
+        function parseSRT(content) {
+            const subtitles = [];
+            const blocks = content.trim().split(/\n\s*\n/);
+
+            for (const block of blocks) {
+                const lines = block.trim().split('\n');
+                if (lines.length >= 3) {
+                    const index = lines[0].trim();
+                    const timestamp = lines[1].trim();
+                    const text = lines.slice(2).join('\n').trim();
+
+                    if (timestamp.includes('-->')) {
+                        subtitles.push({ index, timestamp, text });
+                    }
+                }
+            }
+
+            return subtitles;
+        }
+
+        function generateSRT(subtitles) {
+            return subtitles.map(sub => 
+                `${sub.index}\n${sub.timestamp}\n${sub.text}\n`
+            ).join('\n');
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+        }
+    </script>
+</body>
+</html>
